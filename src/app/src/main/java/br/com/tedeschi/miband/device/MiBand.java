@@ -50,13 +50,13 @@ public class MiBand {
             @Override
             public void onServicesDiscovered(final BluetoothGatt gatt, int status) {
                 super.onServicesDiscovered(gatt, status);
-                Log.d(TAG, "onServicesDiscovered status=" + getStatusString(status));
+                Log.d(TAG, "onServicesDiscovered " + getStatusString(status));
             }
 
             @Override
             public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
                 super.onCharacteristicWrite(gatt, characteristic, status);
-                Log.d(TAG, "onCharacteristicWrite " + characteristic.getUuid() + getStatusString(status));
+                Log.d(TAG, "onCharacteristicWrite " + characteristic.getUuid() + " " + Arrays.toString(characteristic.getValue()) + " " + getStatusString(status));
             }
 
             @Override
@@ -118,6 +118,8 @@ public class MiBand {
         System.arraycopy(rawmessage, 0, command, prefixlength, length);
         System.arraycopy(appSuffix, 0, command, prefixlength + length, appSuffix.length);
 
+        Log.d(TAG, "[Raw] " + Arrays.toString(command));
+
         List<byte[]> chunked = chunk(command);
 
         return chunked;
@@ -152,6 +154,8 @@ public class MiBand {
             System.arraycopy(data, count++ * MAX_CHUNKLENGTH, chunk, 3, copybytes);
 
             list.add(chunk);
+
+            Log.d(TAG, "[Chunk] " + Arrays.toString(chunk));
 
             remaining -= copybytes;
         }

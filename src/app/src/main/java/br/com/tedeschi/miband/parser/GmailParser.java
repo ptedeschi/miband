@@ -1,5 +1,6 @@
 package br.com.tedeschi.miband.parser;
 
+import android.app.Notification;
 import android.content.Context;
 import android.os.Bundle;
 import android.service.notification.StatusBarNotification;
@@ -27,8 +28,14 @@ public class GmailParser extends Parser {
         String title = getStringExtra(extras, android.app.Notification.EXTRA_TITLE);
         String text = getStringExtra(extras, android.app.Notification.EXTRA_TEXT);
 
-        if (text != null && text.equals("Syncing mail...")) {
+        if (title != null && title.equals("Syncing mail…")) {
             return null;
+        }
+
+        String bigText = getStringExtra(extras, Notification.EXTRA_BIG_TEXT);
+
+        if (bigText != null) {
+            text = bigText.replace("\n", " ");
         }
 
         Message message = new Message();
