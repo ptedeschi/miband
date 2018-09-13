@@ -8,29 +8,28 @@ import android.service.notification.StatusBarNotification;
 import br.com.tedeschi.miband.device.IconID;
 import br.com.tedeschi.miband.model.Message;
 import br.com.tedeschi.miband.util.App;
+import br.com.tedeschi.miband.util.StatusBarNotificationUtil;
 
 public class GenericParser extends Parser {
     @Override
     public Message parse(Context context, StatusBarNotification notification) {
-        debug(notification);
-
         Bundle extras = notification.getNotification().extras;
 
-        if (getStringExtra(extras, Notification.EXTRA_SUMMARY_TEXT) != null) {
+        if (StatusBarNotificationUtil.getStringExtra(extras, Notification.EXTRA_SUMMARY_TEXT) != null) {
             return null;
         }
 
         String packageName = notification.getPackageName();
-        String title = getStringExtra(extras, Notification.EXTRA_TITLE);
-        String text = getStringExtra(extras, Notification.EXTRA_TEXT);
+        String title = StatusBarNotificationUtil.getStringExtra(extras, Notification.EXTRA_TITLE);
+        String text = StatusBarNotificationUtil.getStringExtra(extras, Notification.EXTRA_TEXT);
 
         Message message = new Message();
-        message.id = notification.getKey();
-        message.packageName = packageName;
-        message.appName = App.getApplicationName(context, packageName);
-        message.title = title;
-        message.body = text;
-        message.iconId = IconID.NOTIFICATION_GENERIC;
+        message.setId(packageName + "|" + notification.getNotification().when);
+        message.setPackageName(packageName);
+        message.setAppName(App.getApplicationName(context, packageName));
+        message.setTitle(title);
+        message.setBody(text);
+        message.setIconId(IconID.NOTIFICATION_GENERIC);
 
         return message;
     }

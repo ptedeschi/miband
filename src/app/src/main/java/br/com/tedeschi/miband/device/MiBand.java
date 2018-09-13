@@ -85,23 +85,23 @@ public class MiBand {
     private List<byte[]> encodeNotification(Message notification) {
         String appName = "\0" + "UNKNOWN" + "\0";
 
-        if (notification.appName != null) {
-            appName = "\0" + notification.appName + "\0";
+        if (notification.getAppName() != null) {
+            appName = "\0" + notification.getAppName() + "\0";
         }
 
-        String senderOrTiltle = notification.title;
+        String senderOrTiltle = notification.getTitle();
         String message = StringUtils.truncate(senderOrTiltle, 32) + "\0";
 
-        if (notification.subject != null) {
-            message += truncate(notification.subject, 128) + "\n\n";
+        if (notification.getSubject() != null) {
+            message += truncate(notification.getSubject(), 128) + "\n\n";
         }
-        if (notification.body != null) {
-            message += truncate(notification.body, 128);
+        if (notification.getBody() != null) {
+            message += truncate(notification.getBody(), 128);
         }
 
         message = StringUtils.unaccent(message);
 
-        byte customIconId = notification.iconId;
+        byte customIconId = notification.getIconId();
         int maxLength = 230;
         int prefixlength = 3;
 

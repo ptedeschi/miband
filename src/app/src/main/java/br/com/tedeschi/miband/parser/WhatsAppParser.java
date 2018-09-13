@@ -5,29 +5,27 @@ import android.os.Bundle;
 import android.service.notification.StatusBarNotification;
 import android.util.Log;
 
-import br.com.tedeschi.miband.activity.MainActivity;
 import br.com.tedeschi.miband.device.IconID;
 import br.com.tedeschi.miband.model.Message;
 import br.com.tedeschi.miband.util.App;
+import br.com.tedeschi.miband.util.StatusBarNotificationUtil;
 
 public class WhatsAppParser extends Parser {
     private static final String TAG = WhatsAppParser.class.getName();
 
     @Override
     public Message parse(Context context, StatusBarNotification notification) {
-        debug(notification);
-
         Bundle extras = notification.getNotification().extras;
 
-        if (getStringExtra(extras, android.app.Notification.EXTRA_SUMMARY_TEXT) != null) {
+        if (StatusBarNotificationUtil.getStringExtra(extras, android.app.Notification.EXTRA_SUMMARY_TEXT) != null) {
             Log.d(TAG, "Exiting: EXTRA_SUMMARY_TEXT != null");
 
             return null;
         }
 
         String packageName = notification.getPackageName();
-        String title = getStringExtra(extras, android.app.Notification.EXTRA_TITLE);
-        String text = getStringExtra(extras, android.app.Notification.EXTRA_TEXT);
+        String title = StatusBarNotificationUtil.getStringExtra(extras, android.app.Notification.EXTRA_TITLE);
+        String text = StatusBarNotificationUtil.getStringExtra(extras, android.app.Notification.EXTRA_TEXT);
 
         if (title != null && title.equals("WhatsApp Web")) {
             Log.d(TAG, "Exiting: Title is WhatsApp Web");
@@ -47,8 +45,8 @@ public class WhatsAppParser extends Parser {
 
             return null;
         }
-		
-		// Audio
+
+        // Audio
         if (text != null && text.contains("\uD83C\uDFA4")) {
             Log.d(TAG, "Exiting: Audio");
 
@@ -110,12 +108,12 @@ public class WhatsAppParser extends Parser {
         Log.d(TAG, "Final text: " + text);
 
         Message message = new Message();
-        message.id = notification.getKey();
-        message.packageName = packageName;
-        message.appName = App.getApplicationName(context, packageName);
-        message.title = title;
-        message.body = text;
-        message.iconId = IconID.NOTIFICATION_MESSAGE;
+        message.setId(packageName + "|" + notification.getNotification().when);
+        message.setPackageName(packageName);
+        message.setAppName(App.getApplicationName(context, packageName));
+        message.setTitle(title);
+        message.setBody(text);
+        message.setIconId(IconID.NOTIFICATION_MESSAGE);
 
         return message;
     }

@@ -8,15 +8,14 @@ import android.service.notification.StatusBarNotification;
 import br.com.tedeschi.miband.device.IconID;
 import br.com.tedeschi.miband.model.Message;
 import br.com.tedeschi.miband.util.App;
+import br.com.tedeschi.miband.util.StatusBarNotificationUtil;
 
 public class GmailParser extends Parser {
     @Override
     public Message parse(Context context, StatusBarNotification notification) {
-        debug(notification);
-
         Bundle extras = notification.getNotification().extras;
 
-        if (getStringExtra(extras, android.app.Notification.EXTRA_SUMMARY_TEXT) != null) {
+        if (StatusBarNotificationUtil.getStringExtra(extras, android.app.Notification.EXTRA_SUMMARY_TEXT) != null) {
             return null;
         }
 
@@ -25,26 +24,26 @@ public class GmailParser extends Parser {
         }
 
         String packageName = notification.getPackageName();
-        String title = getStringExtra(extras, android.app.Notification.EXTRA_TITLE);
-        String text = getStringExtra(extras, android.app.Notification.EXTRA_TEXT);
+        String title = StatusBarNotificationUtil.getStringExtra(extras, android.app.Notification.EXTRA_TITLE);
+        String text = StatusBarNotificationUtil.getStringExtra(extras, android.app.Notification.EXTRA_TEXT);
 
         if (title != null && title.equals("Syncing mail…")) {
             return null;
         }
 
-        String bigText = getStringExtra(extras, Notification.EXTRA_BIG_TEXT);
+        String bigText = StatusBarNotificationUtil.getStringExtra(extras, Notification.EXTRA_BIG_TEXT);
 
         if (bigText != null) {
             text = bigText.replace("\n", " ");
         }
 
         Message message = new Message();
-        message.id = notification.getKey();
-        message.packageName = packageName;
-        message.appName = App.getApplicationName(context, packageName);
-        message.title = title;
-        message.body = text;
-        message.iconId = IconID.NOTIFICATION_MAIL;
+        message.setId(packageName + "|" + notification.getNotification().when);
+        message.setPackageName(packageName);
+        message.setAppName(App.getApplicationName(context, packageName));
+        message.setTitle(title);
+        message.setBody(text);
+        message.setIconId(IconID.NOTIFICATION_MAIL);
 
         return message;
     }
