@@ -14,11 +14,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import br.com.tedeschi.miband.model.Message;
-import br.com.tedeschi.miband.util.StringUtils;
-
-import static br.com.tedeschi.miband.util.StringUtils.truncate;
-
 
 public class MiBand {
     private static final String TAG = MiBand.class.getName();
@@ -67,11 +62,12 @@ public class MiBand {
         });
     }
 
-    public void sendNotification(Message message) {
-        for (byte[] chunk : encodeNotification(message)) {
+    public void sendNotification(String title, String message, byte customIconId) {
+        for (byte[] chunk : encodeNotification(title, message, customIconId)) {
             BluetoothGattService service = mBluetoothGatt.getService(Gatt.UUID_SERVICE);
             BluetoothGattCharacteristic characteristic = service.getCharacteristic(Gatt.UUID_CHARACTERISTIC);
             characteristic.setValue(chunk);
+            //characteristic.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE);
             mBluetoothGatt.writeCharacteristic(characteristic);
 
             try {
@@ -82,29 +78,15 @@ public class MiBand {
         }
     }
 
-    private List<byte[]> encodeNotification(Message notification) {
+    private List<byte[]> encodeNotification(String title, String message, byte customIconId) {
         String appName = "\0" + "UNKNOWN" + "\0";
 
-        if (notification.getAppName() != null) {
-            appName = "\0" + notification.getAppName() + "\0";
+        if (title != null) {
+            appName = "\0" + title + "\0";
         }
 
-        String senderOrTiltle = notification.getTitle();
-        String message = StringUtils.truncate(senderOrTiltle, 32) + "\0";
-
-        if (notification.getSubject() != null) {
-            message += truncate(notification.getSubject(), 128) + "\n\n";
-        }
-        if (notification.getBody() != null) {
-            message += truncate(notification.getBody(), 128);
-        }
-
-        message = StringUtils.unaccent(message);
-
-        byte customIconId = notification.getIconId();
         int maxLength = 230;
         int prefixlength = 3;
-
         byte[] appSuffix = appName.getBytes();
         int suffixlength = appSuffix.length;
         byte[] rawmessage = message.getBytes();

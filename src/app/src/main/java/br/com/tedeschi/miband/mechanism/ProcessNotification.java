@@ -12,25 +12,47 @@ import br.com.tedeschi.miband.parser.Parser;
 import br.com.tedeschi.miband.parser.WhatsAppParser;
 import br.com.tedeschi.miband.persistence.MessageDatabase;
 import br.com.tedeschi.miband.util.StatusBarNotificationUtil;
+import br.com.tedeschi.miband.util.StringUtils;
 
-public class ProcessNotification {
+public class ProcessNotification implements Runnable {
     private static final String TAG = ProcessNotification.class.getName();
     private static final String DATABASE_NAME = "miband_db";
 
-    public void process(final Context context, final StatusBarNotification notification) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                StatusBarNotificationUtil.debug(notification);
+    private Context context;
+    private StatusBarNotification notification;
 
-                final MessageDatabase notificationDatabase = Room.databaseBuilder(context.getApplicationContext(),
-                        MessageDatabase.class, DATABASE_NAME).fallbackToDestructiveMigration().build();
+    public ProcessNotification(Context context, StatusBarNotification notification) {
+        this.context = context;
+        this.notification = notification;
+    }
 
-                String notificationId = notification.getPackageName() + "|" + notification.getNotification().when;
+    public void run() {
+        Log.d(TAG, "+ProcessNotification");
 
-                Log.d(TAG, "Checking for notification " + notificationId);
+        StatusBarNotificationUtil.debug(notification);
 
-                if (notificationDatabase.daoAccess().fetchNotificationById(notificationId) == null) {
+        final MessageDatabase notificationDatabase = Room.databaseBuilder(context.getApplicationContext(),
+                MessageDatabase.class, DATABASE_NAME).fallbackToDestructiveMigration().build();
+
+        String notificationId = notification.getPackageName() + "|" + notification.getNotification().when;
+
+        Log.d(TAG, "Checking for notification " + notificationId);
+
+        if (notificationDatabase.daoAccess().fetchNotificationById(notificationId) == null) {
+            String packageName = notification.getPackageName();
+
+            Parser parser = null;
+
+            if (packageName.equals("com.whatsapp")) {
+                parser = new WhatsAppParser();
+            } else if (packageName.equals("com.google.android.gm")) {
+                parser = new GmailParser();
+            }
+
+            if (parser != null) {
+                final Message message = parser.parse(context, notification);
+
+                if (message != null) {
                     MiBand miband = new MiBand();
                     miband.connect(context, "<ENTER-YOUR-MIBAND-ADDRESS");
 
@@ -40,39 +62,36 @@ public class ProcessNotification {
                         e.printStackTrace();
                     }
 
-                    String packageName = notification.getPackageName();
+                    String sender = message.getTitle();
+                    String data = StringUtils.truncate(sender, 32) + "\0";
 
-                    Parser parser = null;
-
-                    if (packageName.equals("com.whatsapp")) {
-                        parser = new WhatsAppParser();
-                    } else if (packageName.equals("com.google.android.gm")) {
-                        parser = new GmailParser();
+                    if (message.getSubject() != null) {
+                        data += StringUtils.truncate(message.getSubject(), 128) + "\n\n";
                     }
 
-                    if (parser != null) {
-                        final Message message = parser.parse(context, notification);
-
-                        if (message != null) {
-                            miband.sendNotification(message);
-
-                            Log.d(TAG, "Preparing to add notification " + notificationId);
-
-                            notificationDatabase.daoAccess().insertNotification(message);
-
-                            Log.d(TAG, notificationId + " | Notification added into database");
-                        } else {
-                            Log.d(TAG, "No message to handle");
-                        }
-                    } else {
-                        Log.d(TAG, "No parser to handle it");
+                    if (message.getBody() != null) {
+                        data += StringUtils.truncate(message.getBody(), 128);
                     }
+
+                    miband.sendNotification(message.getAppName(), data, message.getIconId());
+
+                    Log.d(TAG, "Preparing to add notification " + notificationId);
+
+                    notificationDatabase.daoAccess().insertNotification(message);
+
+                    Log.d(TAG, notificationId + " | Notification added into database");
                 } else {
-                    Log.d(TAG, notificationId + " | Notification already exists. Exiting to avoid duplicity");
+                    Log.d(TAG, "No message to handle");
                 }
-
-                notificationDatabase.close();
+            } else {
+                Log.d(TAG, "No parser to handle it");
             }
-        }).start();
+        } else {
+            Log.d(TAG, notificationId + " | Notification already exists. Exiting to avoid duplicity");
+        }
+
+        notificationDatabase.close();
+
+        Log.d(TAG, "-ProcessNotification");
     }
 }

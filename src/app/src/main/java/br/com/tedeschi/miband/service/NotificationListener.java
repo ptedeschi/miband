@@ -5,7 +5,10 @@ import android.os.IBinder;
 import android.service.notification.NotificationListenerService;
 import android.service.notification.StatusBarNotification;
 
+import java.util.concurrent.ExecutorService;
+
 import br.com.tedeschi.miband.mechanism.ProcessNotification;
+import br.com.tedeschi.miband.mechanism.ThreadPool;
 
 public class NotificationListener extends NotificationListenerService {
     private static final String TAG = NotificationListener.class.getName();
@@ -22,7 +25,7 @@ public class NotificationListener extends NotificationListenerService {
     public void onNotificationPosted(StatusBarNotification sbn) {
         super.onNotificationPosted(sbn);
 
-        ProcessNotification processNotification = new ProcessNotification();
-        processNotification.process(this, sbn);
+        ExecutorService executor = ThreadPool.getInstance().getExecutorService();
+        executor.execute(new ProcessNotification(this, sbn));
     }
 }

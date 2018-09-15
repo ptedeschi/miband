@@ -9,6 +9,7 @@ import br.com.tedeschi.miband.device.IconID;
 import br.com.tedeschi.miband.model.Message;
 import br.com.tedeschi.miband.util.App;
 import br.com.tedeschi.miband.util.StatusBarNotificationUtil;
+import br.com.tedeschi.miband.util.StringUtils;
 
 public class GmailParser extends Parser {
     @Override
@@ -36,6 +37,9 @@ public class GmailParser extends Parser {
         if (bigText != null) {
             text = bigText.replace("\n", " ");
         }
+
+        title = StringUtils.unaccent(title);
+        text = StringUtils.unaccent(text);
 
         Message message = new Message();
         message.setId(packageName + "|" + notification.getNotification().when);

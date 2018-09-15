@@ -9,6 +9,7 @@ import br.com.tedeschi.miband.device.IconID;
 import br.com.tedeschi.miband.model.Message;
 import br.com.tedeschi.miband.util.App;
 import br.com.tedeschi.miband.util.StatusBarNotificationUtil;
+import br.com.tedeschi.miband.util.StringUtils;
 
 public class WhatsAppParser extends Parser {
     private static final String TAG = WhatsAppParser.class.getName();
@@ -35,6 +36,13 @@ public class WhatsAppParser extends Parser {
 
         if (text != null && text.equals("Checking for new messages")) {
             Log.d(TAG, "Exiting: Text is Checking for new messages");
+
+            return null;
+        }
+
+        // Photo
+        if (text != null && text.contains("\uD83D\uDCF7")) {
+            Log.d(TAG, "Exiting: Photo");
 
             return null;
         }
@@ -104,8 +112,17 @@ public class WhatsAppParser extends Parser {
             }
         }
 
+        title = StringUtils.unaccent(title);
+        text = StringUtils.unaccent(text);
+
         Log.d(TAG, "Final title: " + title);
         Log.d(TAG, "Final text: " + text);
+
+        if (title.isEmpty() || text.isEmpty()) {
+            Log.d(TAG, "Empty data. Exiting...");
+
+            return null;
+        }
 
         Message message = new Message();
         message.setId(packageName + "|" + notification.getNotification().when);
