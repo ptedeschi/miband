@@ -1,0 +1,52 @@
+<android.support.v7.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <android.support.v7.preference.PreferenceCategory android:title="General">
+        <android.support.v7.preference.SwitchPreferenceCompat
+            android:defaultValue="true"
+            android:key="notification"
+            android:summary="Mi Band will vibrate upon receiving app push message"
+            android:title="App alerts"/>
+
+        <android.support.v7.preference.SwitchPreferenceCompat
+            android:defaultValue="true"
+            android:dependency="notification"
+            android:key="notification_screen"
+            android:title="Only receive when the screen is off" />
+    </android.support.v7.preference.PreferenceCategory>
+
+    <android.support.v7.preference.PreferenceCategory android:title="Email">
+        <android.support.v7.preference.SwitchPreferenceCompat
+            android:defaultValue="true"
+            android:dependency="notification"
+            android:key="notification_email_body"
+            android:title="Show body" />
+    </android.support.v7.preference.PreferenceCategory>
+
+    <android.support.v7.preference.PreferenceCategory android:title="WhatsApp">
+        <android.support.v7.preference.SwitchPreferenceCompat
+            android:defaultValue="true"
+            android:dependency="notification"
+            android:key="notification_group_name"
+            android:title="Show group name" />
+
+        <android.support.v7.preference.SwitchPreferenceCompat
+            android:defaultValue="true"
+            android:dependency="notification"
+            android:key="notification_voice"
+            android:title="Notify on voice" />
+
+        <android.support.v7.preference.SwitchPreferenceCompat
+            android:defaultValue="true"
+            android:dependency="notification"
+            android:key="notification_photo"
+            android:title="Notify on photo" />
+
+        <android.support.v7.preference.SwitchPreferenceCompat
+            android:defaultValue="true"
+            android:dependency="notification"
+            android:key="notification_video"
+            android:title="Notify on video" />
+
+    </android.support.v7.preference.PreferenceCategory>
+
+</android.support.v7.preference.PreferenceScreen>
