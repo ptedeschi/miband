@@ -3,6 +3,7 @@
     package="br.com.tedeschi.miband">
 
     <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="com.android.alarm.permission.SET_ALARM"/>
 
     <application
         android:allowBackup="true"
@@ -24,11 +25,21 @@
             android:enabled="true"
             android:exported="true"
             android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
-
             <intent-filter>
                 <action android:name="android.service.notification.NotificationListenerService" />
             </intent-filter>
         </service>
+
+        <!--<receiver-->
+            <!--android:name=".service.AlarmListener"-->
+            <!--android:enabled="true"-->
+            <!--android:exported="true">-->
+
+            <!--<intent-filter>-->
+                <!--<action android:name="com.android.deskclock.ALARM_CHANGED" />-->
+                <!--<action android:name="android.intent.action.ALARM_CHANGED" />-->
+            <!--</intent-filter>-->
+        <!--</receiver>-->
     </application>
 
 </manifest>

@@ -1,10 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Mi Band</string>
     <string name="str_whatsapp_web">WhatsApp Web</string>
-    <string name="str_whatsapp_checking_for_new_messages">Checking for new messages</string>
+    <string name="str_whatsapp_checking_for_new_messages">Procurando novas mensagens</string>
     <string name="str_whatsapp_photo">📷</string>
     <string name="str_whatsapp_video">🎥</string>
     <string name="str_whatsapp_audio">🎤</string>
     <string name="str_whatsapp_location">📌</string>
-    <string name="str_gmail_syncing_mail">Syncing mail…</string>
+    <string name="str_gmail_syncing_mail">Procurando novas mensagens</string>
 </resources>

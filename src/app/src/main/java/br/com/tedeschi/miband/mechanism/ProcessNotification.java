@@ -7,7 +7,9 @@ import android.util.Log;
 
 import br.com.tedeschi.miband.device.MiBand;
 import br.com.tedeschi.miband.model.Message;
+import br.com.tedeschi.miband.parser.GenericParser;
 import br.com.tedeschi.miband.parser.GmailParser;
+import br.com.tedeschi.miband.parser.Life360Parser;
 import br.com.tedeschi.miband.parser.Parser;
 import br.com.tedeschi.miband.parser.WhatsAppParser;
 import br.com.tedeschi.miband.persistence.MessageDatabase;
@@ -47,6 +49,10 @@ public class ProcessNotification implements Runnable {
                 parser = new WhatsAppParser();
             } else if (packageName.equals("com.google.android.gm")) {
                 parser = new GmailParser();
+            } else if (packageName.equals("com.android.deskclock")) {
+                parser = new GenericParser();
+            } else if (packageName.equals("com.life360.android.safetymapd")) {
+                parser = new Life360Parser();
             }
 
             if (parser != null) {
@@ -54,7 +60,7 @@ public class ProcessNotification implements Runnable {
 
                 if (message != null) {
                     MiBand miband = new MiBand();
-                    miband.connect(context, "<ENTER-YOUR-MIBAND-ADDRESS");
+                    miband.connect(context, "E1:33:93:3C:CB:AF");
 
                     try {
                         Thread.sleep(1000);

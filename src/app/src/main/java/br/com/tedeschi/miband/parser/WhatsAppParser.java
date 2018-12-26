@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.service.notification.StatusBarNotification;
 import android.util.Log;
 
+import br.com.tedeschi.miband.R;
 import br.com.tedeschi.miband.device.IconID;
 import br.com.tedeschi.miband.model.Message;
 import br.com.tedeschi.miband.util.App;
@@ -16,10 +17,12 @@ public class WhatsAppParser extends Parser {
 
     @Override
     public Message parse(Context context, StatusBarNotification notification) {
+        Log.d(TAG, "+parse");
+
         Bundle extras = notification.getNotification().extras;
 
         if (StatusBarNotificationUtil.getStringExtra(extras, android.app.Notification.EXTRA_SUMMARY_TEXT) != null) {
-            Log.d(TAG, "Exiting: EXTRA_SUMMARY_TEXT != null");
+            Log.d(TAG, "-parse -> EXTRA_SUMMARY_TEXT != null");
 
             return null;
         }
@@ -28,35 +31,45 @@ public class WhatsAppParser extends Parser {
         String title = StatusBarNotificationUtil.getStringExtra(extras, android.app.Notification.EXTRA_TITLE);
         String text = StatusBarNotificationUtil.getStringExtra(extras, android.app.Notification.EXTRA_TEXT);
 
-        if (title != null && title.equals("WhatsApp Web")) {
-            Log.d(TAG, "Exiting: Title is WhatsApp Web");
+        Log.d(TAG, "title -> " + title);
+        Log.d(TAG, "text -> " + text);
+
+        if (title != null && title.equals(context.getString(R.string.str_whatsapp_web))) {
+            Log.d(TAG, "-parse -> Title is WhatsApp Web");
 
             return null;
         }
 
-        if (text != null && text.equals("Checking for new messages")) {
-            Log.d(TAG, "Exiting: Text is Checking for new messages");
+        if (text != null && text.equals(context.getString(R.string.str_whatsapp_checking_for_new_messages))) {
+            Log.d(TAG, "-parse -> Text is Checking for new messages");
 
             return null;
         }
 
         // Photo
-        if (text != null && text.contains("\uD83D\uDCF7")) {
-            Log.d(TAG, "Exiting: Photo");
+        if (text != null && text.contains(context.getString(R.string.str_whatsapp_photo))) {
+            Log.d(TAG, "-parse -> Photo");
 
             return null;
         }
 
         // Video
-        if (text != null && text.contains("\uD83C\uDFA5")) {
-            Log.d(TAG, "Exiting: Video");
+        if (text != null && text.contains(context.getString(R.string.str_whatsapp_video))) {
+            Log.d(TAG, "-parse -> Video");
 
             return null;
         }
 
         // Audio
-        if (text != null && text.contains("\uD83C\uDFA4")) {
-            Log.d(TAG, "Exiting: Audio");
+        if (text != null && text.contains(context.getString(R.string.str_whatsapp_audio))) {
+            Log.d(TAG, "-parse -> Audio");
+
+            return null;
+        }
+
+        // Location
+        if (text != null && text.contains(context.getString(R.string.str_whatsapp_location))) {
+            Log.d(TAG, "-parse -> Location");
 
             return null;
         }
@@ -119,7 +132,7 @@ public class WhatsAppParser extends Parser {
         Log.d(TAG, "Final text: " + text);
 
         if (title.isEmpty() || text.isEmpty()) {
-            Log.d(TAG, "Empty data. Exiting...");
+            Log.d(TAG, "-parse -> Empty data");
 
             return null;
         }
@@ -131,6 +144,8 @@ public class WhatsAppParser extends Parser {
         message.setTitle(title);
         message.setBody(text);
         message.setIconId(IconID.NOTIFICATION_MESSAGE);
+
+        Log.d(TAG, "-parse -> Completed");
 
         return message;
     }
